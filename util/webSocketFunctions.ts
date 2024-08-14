@@ -23,3 +23,7 @@ export function deleteNodeInEmacs(node: OrgRoamNode, webSocket: ReconnectingWebS
 export function createNodeInEmacs(node: OrgRoamNode, webSocket: ReconnectingWebSocket) {
     sendMessageToEmacs('create', { id: node.id, title: node.title, ref: node.properties.ROAM_REFS }, webSocket)
 }
+
+export function addNodeToCollectionInEmacs(node: OrgRoamNode, collection: string, webSocket: ReconnectingWebSocket) {
+    sendMessageToEmacs('collect', { id: node.id, collection: collection }, webSocket)
+}

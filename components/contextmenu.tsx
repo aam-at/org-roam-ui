@@ -41,10 +41,11 @@ import {
   ChevronRightIcon,
   PlusSquareIcon,
   MinusIcon,
+  StarIcon,
 } from '@chakra-ui/icons'
 
 import { OrgRoamGraphReponse, OrgRoamLink, OrgRoamNode } from '../api'
-import { deleteNodeInEmacs, openNodeInEmacs, createNodeInEmacs } from '../util/webSocketFunctions'
+import { deleteNodeInEmacs, openNodeInEmacs, createNodeInEmacs, addNodeToCollectionInEmacs } from '../util/webSocketFunctions'
 import { BiNetworkChart } from 'react-icons/bi'
 import { TagMenu } from './TagMenu'
 import { initialFilter, TagColors } from './config'
@@ -82,7 +83,9 @@ export const ContextMenu = (props: ContextMenuProps) => {
     filter,
   } = props
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const collectionRef = useRef('')
   const copyRef = useRef<any>()
+
   return (
     <>
       <Menu defaultIsOpen closeOnBlur={false} onClose={() => menuClose()}>
@@ -175,6 +178,20 @@ export const ContextMenu = (props: ContextMenuProps) => {
                             </Box>
                         </MenuItem> */}
 
+              {target && (
+                <MenuItem
+                  icon={<StarIcon />}
+                  onClick={() => {
+                    const collection = prompt('Enter collection name:', collectionRef.current)
+                    if (collection) {
+                      collectionRef.current = collection
+                      addNodeToCollectionInEmacs(target, collection, webSocket)
+                    }
+                  }}
+                >
+                  Collect node
+                </MenuItem>
+              )}
               <MenuItem
                 icon={<ViewIcon />}
                 onClick={() => {
