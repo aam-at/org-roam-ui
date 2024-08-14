@@ -38,7 +38,7 @@ export const getNodeColor = ({
   if (visuals.emacsNodeColor && node.id === emacsNodeId) {
     return getThemeColor(visuals.emacsNodeColor, theme)
   }
-  if (tagColors && node?.tags.some((tag) => tagColors[tag])) {
+  if (tagColors && node?.tags?.some((tag) => tagColors[tag])) {
     const tagColor = tagColors[node?.tags.filter((tag) => tagColors[tag])[0]]
     return needsHighlighting
       ? highlightColors[tagColor][tagColor](visuals.highlightFade * opacity)

@@ -466,20 +466,32 @@ This database model won't be supported in the future, please consider upgrading.
 
 (defun org-roam-ui--get-nodes ()
   "."
-  (org-roam-db-query [:select [id
-                                file
-                                title
-                                level
-                                pos
-                                olp
-                                properties
-                                (funcall group-concat tag
-                                         (emacsql-escape-raw \, ))]
-                       :as tags
-                       :from nodes
-                       :left-join tags
-                       :on (= id node_id)
-                       :group :by id]))
+  (org-roam-db-query
+   "SELECT
+      id,
+      file,
+      title,
+      level,
+      pos,
+      olp,
+      properties,
+      '(' || group_concat(tag, ' ') || ')' as tags
+    FROM
+      (
+        SELECT
+          id,
+          file,
+          title,
+          level,
+          pos,
+          olp,
+          properties,
+          tag
+        FROM nodes
+        LEFT JOIN tags ON id = node_id
+        GROUP BY id, tag
+      )
+    GROUP BY id"))
 
 (defun org-roam-ui--get-links (&optional old)
   "Get the cites and links tables as rows from the org-roam db.
@@ -609,14 +621,7 @@ ROWS is the sql result, while COLUMN-NAMES is the columns to use."
   (let (res)
     (while rows
       ;; I don't know how to get the tags as a simple list, so we post process it
-      (if (not (string= (car column-names) "tags"))
-          (push (cons (pop column-names) (pop rows)) res)
-        (push (cons (pop column-names)
-                    (seq-remove
-                     (lambda (elt) (string= elt ","))
-                     rows))
-              res)
-        (setq rows nil)))
+      (push (cons (pop column-names) (pop rows)) res))
     res))
 
 (defun org-roam-ui-get-theme ()
